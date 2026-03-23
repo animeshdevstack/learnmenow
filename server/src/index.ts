@@ -23,7 +23,8 @@ app.use(cors({
         "http://localhost:3000", 
         "http://localhost:5173",
         "http://www.localhost.com:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "https://learnmenow-hph9nbuzg-animeshdevstack-3296s-projects.vercel.app/"
     ],
     credentials: true,
 }));
