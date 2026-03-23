@@ -2,18 +2,18 @@ import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Alert, Box, CircularProgress, Typography } from '@mui/material'
 import { MenuBook } from '@mui/icons-material'
-import UserAuthShell from '../../../components/user/UserAuthShell'
-import UserLabeledSelect from '../../../components/user/UserLabeledSelect'
-import UserTopicCheckboxList from '../../../components/user/UserTopicCheckboxList'
+import UserAuthShell from '@/components/user/UserAuthShell'
+import UserLabeledSelect from '@/components/user/UserLabeledSelect'
+import UserTopicCheckboxList from '@/components/user/UserTopicCheckboxList'
 import Button from '../../../components/shared/button/Button'
 import '../../../components/shared/form/Form.css'
 import {
   userAccentSpinnerSx,
   userEmptyStateTextSx,
   userSelectFieldLabelSx,
-} from '../../../components/user/userAuthShell.theme'
+} from '@/components/user/userAuthShell.theme'
 import { usePlanningFlow } from './usePlanningFlow'
-import { entityId, toSelectOptions } from '../../../components/user/userSelectOptions'
+import { entityId, toSelectOptions } from '@/components/user/userSelectOptions'
 import './Planning.css'
 
 const brandMark = <MenuBook sx={{ color: 'white', fontSize: 22 }} />

@@ -11,10 +11,10 @@ import {
   Today,
   Tune,
 } from '@mui/icons-material'
-import UserAuthShell from '../../../components/user/UserAuthShell'
+import UserAuthShell from '@/components/user/UserAuthShell'
 import Button from '../../../components/shared/button/Button'
 import { getAuthToken, getUserInfo, logout } from '../../../helper/auth.helper'
-import { userEmptyStateTextSx, userShellSubtitleSx } from '../../../components/user/userAuthShell.theme'
+import { userEmptyStateTextSx, userShellSubtitleSx } from '@/components/user/userAuthShell.theme'
 import './Dashboard.css'
 
 const ROUTINE_STORAGE_KEY = 'learnMeNowRoutine'

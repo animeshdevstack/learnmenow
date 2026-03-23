@@ -5,7 +5,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Config from '../../../config/config'
 import { getAuthToken, getUserInfo } from '../../../helper/auth.helper'
 import { setPlanningSelection } from '../../../store/slices/planningSlice'
-import { entityId } from '../../../components/user/userSelectOptions'
+import { entityId } from '@/components/user/userSelectOptions'
 
 export function usePlanningFlow() {
   const dispatch = useDispatch()

@@ -3,16 +3,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material'
 import { EmojiEvents } from '@mui/icons-material'
-import UserAuthShell from '../../../components/user/UserAuthShell'
-import UserLabeledSelect from '../../../components/user/UserLabeledSelect'
-import { toSelectOptions } from '../../../components/user/userSelectOptions'
+import UserAuthShell from '@/components/user/UserAuthShell'
+import UserLabeledSelect from '@/components/user/UserLabeledSelect'
+import { toSelectOptions } from '@/components/user/userSelectOptions'
 import {
   userEmptyStateTextSx,
   userPrimaryCtaButtonSx,
   userAccentSpinnerSx,
   userSpinnerCenterSx,
   userTextNavLinkSx,
-} from '../../../components/user/userAuthShell.theme'
+} from '@/components/user/userAuthShell.theme'
 import Config from '../../../config/config'
 import { getAuthToken } from '../../../helper/auth.helper'
 import { useCompetitions } from './useCompetitions'

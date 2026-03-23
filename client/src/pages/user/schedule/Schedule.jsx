@@ -17,11 +17,11 @@ import {
   useTheme,
 } from '@mui/material'
 import { CalendarMonth, MenuBook, Schedule as ScheduleIcon } from '@mui/icons-material'
-import UserAuthShell from '../../../components/user/UserAuthShell'
+import UserAuthShell from '@/components/user/UserAuthShell'
 import Button from '../../../components/shared/button/Button'
 import { getAuthToken } from '../../../helper/auth.helper'
 import Config from '../../../config/config'
-import { userEmptyStateTextSx, userSelectFieldLabelSx } from '../../../components/user/userAuthShell.theme'
+import { userEmptyStateTextSx, userSelectFieldLabelSx } from '@/components/user/userAuthShell.theme'
 import { computeEndFromStart, conflictsWithSiblings } from './scheduleHelpers'
 import './Schedule.css'
 

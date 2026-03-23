@@ -15,8 +15,8 @@ import {
   Typography,
 } from '@mui/material'
 import { CalendarMonth, MenuBook } from '@mui/icons-material'
-import UserAuthShell from '../../../components/user/UserAuthShell'
-import UserLabeledSelect from '../../../components/user/UserLabeledSelect'
+import UserAuthShell from '@/components/user/UserAuthShell'
+import UserLabeledSelect from '@/components/user/UserLabeledSelect'
 import Button from '../../../components/shared/button/Button'
 import {
   userDarkSelectMenuProps,
@@ -25,7 +25,7 @@ import {
   userSelectFieldLabelSx,
   userSelectPlaceholderSx,
   userSelectValueSx,
-} from '../../../components/user/userAuthShell.theme'
+} from '@/components/user/userAuthShell.theme'
 import { getAuthToken } from '../../../helper/auth.helper'
 import Config from '../../../config/config'
 import '../planning/Planning.css'
