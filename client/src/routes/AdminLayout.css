@@ -1,0 +1,119 @@
+/* Admin Layout Styles */
+.admin-layout {
+  min-height: 100vh;
+  background: #111827;
+  position: relative;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+.admin-content {
+  margin-top: 70px;
+  margin-left: 280px;
+  min-height: calc(100vh - 70px);
+  padding: 2rem;
+  transition: all 0.3s ease;
+  background: #111827;
+  width: calc(100vw - 280px);
+  box-sizing: border-box;
+  overflow-x: auto;
+  position: relative;
+}
+
+.admin-content.sidebar-closed {
+  margin-left: 0;
+  width: 100vw;
+}
+
+.admin-content.sidebar-open {
+  margin-left: 280px;
+  width: calc(100vw - 280px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .admin-content {
+    margin-left: 0;
+    width: 100vw;
+    padding: 1.5rem;
+  }
+  
+  .admin-content.sidebar-open {
+    margin-left: 0;
+    width: 100vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-content {
+    margin-left: 0;
+    width: 100vw;
+    padding: 1rem;
+  }
+  
+  .admin-content.sidebar-open {
+    margin-left: 0;
+    width: 100vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-content {
+    padding: 0.75rem;
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+    width: 100vw;
+  }
+}
+
+/* Content Animation */
+.admin-content {
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure proper scrolling */
+.admin-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for dashboard content */
+.admin-content .admin-dashboard {
+  width: 100%;
+  max-width: none;
+  overflow: visible;
+}
+
+/* Ensure stats grid doesn't overflow */
+.admin-content .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 1200px) {
+  .admin-content .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-content .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

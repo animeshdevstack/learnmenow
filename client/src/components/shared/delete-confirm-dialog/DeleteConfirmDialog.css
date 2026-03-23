@@ -1,0 +1,107 @@
+/* Delete Confirmation Dialog Styles */
+.delete-confirm-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.delete-warning {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.warning-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.warning-icon svg {
+  color: #fbbf24;
+}
+
+.warning-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f9fafb;
+  margin: 0 0 0.75rem 0;
+}
+
+.warning-message {
+  color: #d1d5db;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.item-details {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.item-details p {
+  margin: 0.25rem 0;
+  color: #d1d5db;
+  font-size: 0.875rem;
+}
+
+.item-details strong {
+  color: #f9fafb;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #374151;
+}
+
+.cancel-btn,
+.delete-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.cancel-btn {
+  background: #374151;
+  color: #d1d5db;
+  border: 1px solid #4b5563;
+}
+
+.cancel-btn:hover {
+  background: #4b5563;
+  color: #f9fafb;
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .delete-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .delete-btn {
+    width: 100%;
+  }
+}

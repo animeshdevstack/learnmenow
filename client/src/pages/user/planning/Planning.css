@@ -1,0 +1,125 @@
+/* Study planner — layout + topic list (MUI shell/theme handles the card). */
+
+.planning-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .planning-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.planning-topics-block {
+  width: 100%;
+  margin-top: 1.25rem;
+}
+
+.planning-topics-panel {
+  margin-top: 0.75rem;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem 0.625rem;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(71, 85, 105, 0.35);
+  box-sizing: border-box;
+}
+
+.planning-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0 3rem;
+}
+
+.planning-spinner--compact {
+  padding: 0.75rem 0;
+}
+
+.planning-topic-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.planning-topic-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.25);
+}
+
+.planning-topic-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0.15rem;
+}
+
+.planning-topics-panel .planning-topic-checkbox.MuiCheckbox-root {
+  flex-shrink: 0;
+  padding: 0.25rem;
+  /* MUI Checkbox icon uses `color` for the outline; white reads clearly on dark panels */
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.planning-topics-panel .planning-topic-checkbox.MuiCheckbox-root.Mui-checked {
+  color: #06b6d4;
+}
+
+.planning-topic-label {
+  flex: 1;
+  color: rgba(226, 232, 240, 0.95);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  cursor: pointer;
+  padding-top: 1px;
+}
+
+/* Shared `Button` inside UserAuthShell — match slate CTA / text link from userAuthShell.theme */
+.user-auth-shell .planning-actions .planning-back-btn {
+  background: transparent;
+  border: none;
+  color: rgba(226, 232, 240, 0.88);
+  box-shadow: none;
+  min-height: auto;
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+}
+
+.user-auth-shell .planning-actions .planning-back-btn:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.08);
+  color: #e2e8f0;
+}
+
+.user-auth-shell .planning-actions .planning-next-btn {
+  background: rgba(148, 163, 184, 0.92);
+  color: #0f172a;
+  border: none;
+  box-shadow: none;
+}
+
+.user-auth-shell .planning-actions .planning-next-btn:hover:not(:disabled) {
+  background: rgba(226, 232, 240, 0.98);
+  transform: none;
+}
+
+.user-auth-shell .planning-actions .planning-next-btn:disabled {
+  opacity: 1;
+  background: rgba(51, 65, 85, 0.55);
+  color: rgba(148, 163, 184, 0.5);
+}
+
+.user-auth-shell .planning-shell-cta.btn {
+  background: rgba(148, 163, 184, 0.92);
+  color: #0f172a;
+  border: none;
+  box-shadow: none;
+}
+
+.user-auth-shell .planning-shell-cta.btn:hover:not(:disabled) {
+  background: rgba(226, 232, 240, 0.98);
+  transform: none;
+}

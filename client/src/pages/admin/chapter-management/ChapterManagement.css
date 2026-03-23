@@ -1,0 +1,289 @@
+/* Chapter Management Styles */
+.chapter-management {
+  padding: 24px;
+  background-color: #1f2937;
+  min-height: 100vh;
+  color: #f9fafb;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.breadcrumb-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.breadcrumb-back:hover {
+  background-color: #374151;
+}
+
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: #6b7280;
+}
+
+.breadcrumb-current {
+  color: #f9fafb;
+  font-weight: 500;
+}
+
+.breadcrumb-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+.breadcrumb-link:hover {
+  background-color: #374151;
+  color: #60a5fa;
+}
+
+/* Header */
+.chapter-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3b82f6;
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Error Message */
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+/* Filters */
+.chapter-management-filters {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Loading */
+.chapter-management-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #9ca3af;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #374151;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Table */
+.chapters-table-container {
+  background: #374151;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.chapters-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.chapters-table thead {
+  background-color: #4b5563;
+  border-bottom: 1px solid #6b7280;
+}
+
+.chapters-table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-weight: 600;
+  color: #f9fafb;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chapters-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #4b5563;
+  vertical-align: middle;
+}
+
+.chapters-table tbody tr:hover {
+  background-color: #4b5563;
+}
+
+.chapters-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Chapter Info */
+.chapter-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chapter-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.chapter-name {
+  font-weight: 500;
+  color: #f9fafb;
+  font-size: 15px;
+}
+
+.chapter-name-link {
+  background: none;
+  border: none;
+  font-weight: 500;
+  color: #3b82f6;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.chapter-name-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.chapter-duration,
+.chapter-priority {
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  color: #fbbf24;
+}
+
+.edit-btn:hover {
+  background: #fbbf24;
+  color: #1f2937;
+  border-color: #fbbf24;
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+
+.delete-btn:hover {
+  background: #ef4444;
+  color: #1f2937;
+  border-color: #ef4444;
+}
+
+/* No Data */
+.no-data {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chapter-management {
+    padding: 16px;
+  }
+  
+  .chapter-management-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .chapters-table-container {
+    overflow-x: auto;
+  }
+  
+  .chapters-table {
+    min-width: 600px;
+  }
+  
+  .chapters-table th,
+  .chapters-table td {
+    padding: 12px 16px;
+  }
+}

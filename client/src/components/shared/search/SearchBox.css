@@ -1,0 +1,46 @@
+/* Reusable SearchBox Component Styles */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #1f2937;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid #374151;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.search-box:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-box .search-input {
+  border: none;
+  background: none;
+  outline: none;
+  margin-left: 8px;
+  font-size: 0.9rem;
+  color: #f9fafb;
+  flex: 1;
+}
+
+.search-box .search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-box svg {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .search-box {
+    width: 100% !important;
+  }
+  
+  .search-box .search-input {
+    width: 100%;
+  }
+}

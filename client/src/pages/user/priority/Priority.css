@@ -1,0 +1,149 @@
+/* Priority step — dark task panel (matches UserAuthShell) + rank buttons + schedule CTA */
+
+.priority-card {
+  width: 100%;
+  background: rgba(30, 41, 59, 0.65);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: 12px;
+  padding: 1.25rem 1rem 1.5rem;
+  box-sizing: border-box;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(6px);
+}
+
+.priority-card-title {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(241, 245, 249, 0.98);
+  letter-spacing: 0.02em;
+}
+
+.priority-topic-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.45);
+}
+
+.priority-topic-row:last-child {
+  border-bottom: none;
+}
+
+.priority-topic-name {
+  flex: 1;
+  min-width: 140px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(226, 232, 240, 0.95);
+  line-height: 1.4;
+}
+
+.priority-ranks {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.priority-rank-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  background: rgba(15, 23, 42, 0.55);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.92);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.priority-rank-btn:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.65);
+}
+
+.priority-rank-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.priority-rank-btn.is-active {
+  color: #fff;
+}
+
+.priority-rank-btn--1 {
+  border-color: #ef4444;
+}
+.priority-rank-btn--1.is-active {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.priority-rank-btn--2 {
+  border-color: #eab308;
+}
+.priority-rank-btn--2.is-active {
+  background: #ca8a04;
+  border-color: #ca8a04;
+}
+
+.priority-rank-btn--3 {
+  border-color: #22c55e;
+}
+.priority-rank-btn--3.is-active {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.priority-rank-btn--4 {
+  border-color: #3b82f6;
+}
+.priority-rank-btn--4.is-active {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.priority-rank-btn--5 {
+  border-color: #a855f7;
+}
+.priority-rank-btn--5.is-active {
+  border-color: #9333ea;
+  background: #9333ea;
+}
+
+.priority-form-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.priority-schedule-btn {
+  width: 100%;
+  margin-top: 0.25rem;
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(212, 196, 168, 0.55) !important;
+  box-shadow: none !important;
+}
+
+.priority-schedule-btn:hover:not(:disabled) {
+  background: rgba(30, 41, 59, 0.98) !important;
+  transform: none !important;
+}
+
+.priority-schedule-btn:disabled {
+  opacity: 0.55;
+}
