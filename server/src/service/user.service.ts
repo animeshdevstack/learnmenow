@@ -161,9 +161,13 @@ const signupUserService = async (FName: string, LName: string, Phone: number, Em
       Role: "User",
     });
     const savedUser = await newUser.save();
-    // TODO: Needs to send the Email for verification process: verification link needs to change.
     const verificationToken = generateToken({ id: savedUser._id, email: savedUser.Email }, "10minutes");
-    await sendVerificationEmail(FName, Email, `${configuration.FRONTEND_URL}user/verify-email/${verificationToken as string}`);
+    const base = String(configuration.FRONTEND_URL).replace(/\/?$/, "/");
+    const verificationLink = `${base}user/verify-email/${verificationToken as string}`;
+    // Do not block HTTP on Gmail SMTP — it can hang ~2min and clients time out while the user is already saved.
+    void sendVerificationEmail(FName, Email, verificationLink).catch((err) => {
+      console.error("[signup] verification email failed:", err);
+    });
     return {
       FName: savedUser.FName || undefined,
       LName: savedUser.LName || undefined,
@@ -241,7 +245,8 @@ const resendVerificationEmailService = async (Email: string): Promise<boolean> =
     if(!user) throw new Error("No user found with the provided email");
     if(user.IsVerified) throw new Error("Email is already verified! Please login to your account.");
     const verificationToken = generateToken({ id: user._id, email: user.Email }, "10minutes");
-    await sendVerificationEmail(user.FName, user.Email, `${configuration.FRONTEND_URL}user/verify-email/${verificationToken as string}`);
+    const base = String(configuration.FRONTEND_URL).replace(/\/?$/, "/");
+    await sendVerificationEmail(user.FName, user.Email, `${base}user/verify-email/${verificationToken as string}`);
     return true;
   } catch (error: any) {
     throw new Error(error.message || "Internal server error");
@@ -255,7 +260,8 @@ const forgotPasswordService = async (Email: string): Promise<boolean> => {
     const user = await userModel.findOne({ Email });
     if(!user) throw new Error("No user found with the provided email");
     const verificationToken = generateToken({ id: user._id, email: user.Email }, "10minutes");
-    await sendForgetPasswordEmail(user.FName, user.Email, `${configuration.FRONTEND_URL}user/reset-password/${verificationToken as string}`);
+    const base = String(configuration.FRONTEND_URL).replace(/\/?$/, "/");
+    await sendForgetPasswordEmail(user.FName, user.Email, `${base}user/reset-password/${verificationToken as string}`);
     return true;
   } catch (error: any) {
     throw new Error(error.message || "Internal server error while sending the reset password email");

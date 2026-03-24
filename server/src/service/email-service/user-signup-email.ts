@@ -11,6 +11,9 @@ export const sendVerificationEmail = async (name: string, to: string, verificati
         user: configuration.ADMIN_GMAIL_ACCOUNT,
         pass: configuration.ADMIN_GMAIL_PASSWORD,
       },
+      connectionTimeout: 15_000,
+      greetingTimeout: 15_000,
+      socketTimeout: 20_000,
     });
     const mailOptions = {
       from: `"CompetitiveExamPrep" <${configuration.ADMIN_GMAIL_ACCOUNT}>`,
