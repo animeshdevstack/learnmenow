@@ -80,10 +80,17 @@ app.use(`${configuration.BASE_URL}/topic`, topicRouter);
 app.use(errorHandler);
 
 void (async () => {
+  if (process.env.RENDER === "true" && !process.env.MONGO_URI) {
+    console.error(
+      "FATAL: MONGO_URI is not set. Add it under Render → Environment for this service."
+    );
+    process.exit(1);
+  }
   try {
     await Connection();
-    app.listen(PORT, () => {
-      console.log(`App is working in port: ${PORT}`);
+    // Render (and most PaaS) require listening on all interfaces, not only localhost.
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Listening on 0.0.0.0:${PORT}`);
     });
   } catch (err) {
     console.error("Failed to connect to database — exiting.", err);
