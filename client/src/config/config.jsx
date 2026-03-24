@@ -1,5 +1,5 @@
-const backendBase = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080/v1/api/'
-
+const backendBase = import.meta.env.VITE_BACKEND_URL
+console.log("backendBase", backendBase)
 const Config = {
   backendUrl: backendBase,
   /**

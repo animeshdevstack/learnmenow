@@ -24,7 +24,8 @@ app.use(cors({
         "http://localhost:5173",
         "http://www.localhost.com:5173",
         "http://127.0.0.1:5173",
-        "https://learnmenow-hph9nbuzg-animeshdevstack-3296s-projects.vercel.app/"
+        "https://learnmenow-hph9nbuzg-animeshdevstack-3296s-projects.vercel.app/",
+        "https://learnmenow.vercel.app",
     ],
     credentials: true,
 }));
@@ -78,7 +79,14 @@ app.use(`${configuration.BASE_URL}/topic`, topicRouter);
 
 app.use(errorHandler);
 
-app.listen(PORT, ()=>{
-    Connection();
-    console.log(`App is working in port: ${PORT}`);
-});
+void (async () => {
+  try {
+    await Connection();
+    app.listen(PORT, () => {
+      console.log(`App is working in port: ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to connect to database — exiting.", err);
+    process.exit(1);
+  }
+})();
