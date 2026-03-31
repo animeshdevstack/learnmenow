@@ -14,7 +14,7 @@ import {
   userTextNavLinkSx,
 } from '@/components/user/userAuthShell.theme'
 import Config from '../../../config/config'
-import { getAuthToken } from '../../../helper/auth.helper'
+import { getAuthToken, getUserInfo, setStoredUserCompetitionId } from '../../../helper/auth.helper'
 import { useCompetitions } from './useCompetitions'
 
 const brandMark = <EmojiEvents sx={{ color: 'white', fontSize: 22 }} />
@@ -22,6 +22,7 @@ const brandMark = <EmojiEvents sx={{ color: 'white', fontSize: 22 }} />
 const Competition = () => {
   const navigate = useNavigate()
   const token = getAuthToken()
+  const existingCompetitionId = getUserInfo().competitionId
   const { competitions, loading, error } = useCompetitions(token)
   const competitionOptions = useMemo(() => toSelectOptions(competitions), [competitions])
   const [selectedId, setSelectedId] = useState('')
@@ -32,12 +33,17 @@ const Competition = () => {
     setNextError('')
   }, [selectedId])
 
+  useEffect(() => {
+    if (!token || !existingCompetitionId) return
+    navigate('/user/planning', { replace: true, state: { competitionId: String(existingCompetitionId) } })
+  }, [token, existingCompetitionId, navigate])
+
   const handleNext = async () => {
     if (!selectedId || !token) return
     setNextError('')
     setNextLoading(true)
     try {
-      await axios.put(
+      const { data } = await axios.put(
         `${Config.backendUrl}user/update-competition`,
         { CompetitionId: selectedId },
         {
@@ -47,7 +53,9 @@ const Competition = () => {
           },
         }
       )
-      navigate('/user/planning', { state: { competitionId: selectedId } })
+      const savedCompetitionId = String(data?.updatedUser?.CompetitionId ?? selectedId)
+      setStoredUserCompetitionId(savedCompetitionId)
+      navigate('/user/planning', { state: { competitionId: savedCompetitionId } })
     } catch (err) {
       const msg =
         err.response?.data?.message ||

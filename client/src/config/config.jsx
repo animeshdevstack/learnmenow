@@ -15,6 +15,10 @@ const Config = {
   /** PUT update saved plan — requires schedule id from POST response `data.scheduleId`. */
   userScheduleByIdUrl: (scheduleId) =>
     `${String(backendBase).replace(/\/?$/, '/')}user/schedule/${scheduleId}`,
+  /** GET today’s single-day slice (auth). */
+  userTodayPlanUrl: `${String(backendBase).replace(/\/?$/, '/')}user/today-plan`,
+  /** GET full saved timetable for the user (auth). */
+  userActivePlanUrl: `${String(backendBase).replace(/\/?$/, '/')}user/active-plan`,
 }
 
 export default Config

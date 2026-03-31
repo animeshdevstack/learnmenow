@@ -74,6 +74,15 @@
   letter-spacing: 0.02em;
 }
 
+.schedule-time-pill--static {
+  cursor: default;
+  pointer-events: none;
+}
+
+.schedule-time-pill--static:hover {
+  background: rgba(15, 23, 42, 0.92);
+}
+
 .schedule-time-pill--edit {
   cursor: default;
 }

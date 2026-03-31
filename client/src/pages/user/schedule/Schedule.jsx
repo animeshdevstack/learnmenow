@@ -23,6 +23,7 @@ import { getAuthToken } from '../../../helper/auth.helper'
 import Config from '../../../config/config'
 import { userEmptyStateTextSx, userSelectFieldLabelSx } from '@/components/user/userAuthShell.theme'
 import { computeEndFromStart, conflictsWithSiblings } from './scheduleHelpers'
+import { formatCalendarDate, slotClockRangeTooltip, slotLabel } from '../../../utils/scheduleDisplayLabels'
 import './Schedule.css'
 
 const ROUTINE_STORAGE_KEY = 'learnMeNowRoutine'
@@ -30,42 +31,6 @@ const ROUTINE_STORAGE_KEY = 'learnMeNowRoutine'
 const brandMark = <MenuBook sx={{ color: 'white', fontSize: 22 }} />
 
 const shellPaper = { maxWidth: 900, width: '100%', mx: 'auto' }
-
-const formatCalendarDate = (isoDate) => {
-  if (!isoDate || typeof isoDate !== 'string') return ''
-  const parts = isoDate.split('-').map(Number)
-  if (parts.length !== 3 || parts.some(Number.isNaN)) return isoDate
-  const [y, m, d] = parts
-  const dt = new Date(y, m - 1, d)
-  return dt.toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
-const slotLabel = (value) => {
-  const map = {
-    morning: 'Morning',
-    afternoon: 'Afternoon',
-    evening: 'Evening',
-    night: 'Night',
-    late_night: 'Late Night',
-  }
-  return map[value] || value
-}
-
-const slotClockRangeTooltip = (value) => {
-  const map = {
-    morning: '05:00–12:00',
-    afternoon: '12:00–17:00',
-    evening: '17:00–21:00',
-    night: '21:00–23:00',
-    late_night: '23:00–24:00 or 00:00–05:00 (one segment per day, chosen at random)',
-  }
-  return map[value] || ''
-}
 
 const Schedule = () => {
   const navigate = useNavigate()

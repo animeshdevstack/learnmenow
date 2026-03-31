@@ -18,6 +18,8 @@ import {
   updateCompetitionService,
   scheduleTimeTableService,
   updateUserScheduleService,
+  getActivePlanService,
+  getTodayPlanService,
 } from "../service/user-competition.service";
 
 interface AuthRequest extends Request {
@@ -275,6 +277,34 @@ const updateUserSchedule = async (
   }
 };
 
+const getTodayPlan = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const userId = (req.user as any)?.id;
+    const todayPlan = await getTodayPlanService(userId as string);
+    return res.status(200).json({
+      success: true,
+      message: "Today's plan fetched successfully",
+      data: todayPlan
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+const getActivePlan = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const userId = (req.user as any)?.id;
+    const plan = await getActivePlanService(userId as string);
+    return res.status(200).json({
+      success: true,
+      message: "Active plan fetched successfully",
+      data: plan
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 export {
   createUser,
   getAllUser,
@@ -289,5 +319,7 @@ export {
   resetPassword,
   updateCompetition,
   scheduleTimeTable,
-  updateUserSchedule
+  updateUserSchedule,
+  getTodayPlan,
+  getActivePlan
 };
