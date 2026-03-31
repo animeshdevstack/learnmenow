@@ -126,18 +126,107 @@
 
 .today-plan-session {
   display: grid;
-  grid-template-columns: minmax(148px, 1fr) 2fr;
-  gap: 0.75rem 1rem;
-  align-items: start;
-  padding: 0.65rem 0.5rem;
+  grid-template-columns: minmax(112px, auto) minmax(0, 1fr) auto;
+  gap: 0.65rem 0.75rem;
+  align-items: center;
+  padding: 0.65rem 0.65rem;
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.35);
   border: 1px solid rgba(51, 65, 85, 0.35);
 }
 
+.today-plan-session--completed {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(6, 78, 59, 0.12);
+}
+
+.today-plan-session__left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.today-plan-session__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.today-plan-session__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid rgba(6, 182, 212, 0.45);
+  color: rgba(165, 243, 252, 0.95);
+  background: rgba(6, 182, 212, 0.1);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.today-plan-session__status:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.65);
+}
+
+.today-plan-session__status:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.today-plan-session__status:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.today-plan-session__status--done {
+  border-color: rgba(52, 211, 153, 0.55);
+  color: rgba(167, 243, 208, 0.98);
+  background: rgba(16, 185, 129, 0.18);
+}
+
+.today-plan-session__status--done:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.28);
+  border-color: rgba(52, 211, 153, 0.75);
+}
+
+.today-plan-session__status-icon {
+  font-size: 1rem !important;
+  opacity: 0.95;
+}
+
 @media (max-width: 520px) {
   .today-plan-session {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: start;
+  }
+
+  .today-plan-session__left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .today-plan-session__actions {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    padding-top: 2px;
+  }
+
+  .today-plan-session__body {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
 

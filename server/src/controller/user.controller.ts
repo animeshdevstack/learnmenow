@@ -18,6 +18,7 @@ import {
   updateCompetitionService,
   scheduleTimeTableService,
   updateUserScheduleService,
+  patchScheduleSessionsCompletionService,
   getActivePlanService,
   getTodayPlanService,
   checkDeadlineService
@@ -278,6 +279,30 @@ const updateUserSchedule = async (
   }
 };
 
+const patchScheduleSessionsCompletion = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const userId = (req.user as any)?.id;
+    const { scheduleId } = req.params;
+    const result = await patchScheduleSessionsCompletionService(
+      userId as string,
+      scheduleId as string,
+      req.body
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Session completion updated",
+      data: result
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 const getTodayPlan = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const userId = (req.user as any)?.id;
@@ -335,6 +360,7 @@ export {
   updateCompetition,
   scheduleTimeTable,
   updateUserSchedule,
+  patchScheduleSessionsCompletion,
   getTodayPlan,
   getActivePlan,
   checkDeadline

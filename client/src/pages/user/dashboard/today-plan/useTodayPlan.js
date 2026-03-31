@@ -46,9 +46,40 @@ export function useTodayPlan(token) {
     }
   }, [token])
 
+  const patchSessionCompletion = useCallback(
+    async ({ scheduleId, date, topicId, isCompleted }) => {
+      if (!token) {
+        throw new Error('Not authenticated.')
+      }
+      if (!scheduleId) {
+        throw new Error('Missing schedule id.')
+      }
+
+      const { data: body } = await axios.patch(
+        Config.userScheduleSessionsPatchUrl(scheduleId),
+        {
+          updates: [{ date, topicId, isCompleted }],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!body?.success) {
+        throw new Error(body?.message || 'Could not update session status.')
+      }
+      return body?.data
+    },
+    [token]
+  )
+
   useEffect(() => {
     void refetch()
   }, [refetch])
 
-  return { data, loading, error, refetch }
+  return { data, loading, error, refetch, patchSessionCompletion }
 }
