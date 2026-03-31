@@ -241,7 +241,7 @@ const Schedule = () => {
           Generate a plan from Study Planner to see your timetable here. If you already created one, open this page again right after
           generating, or return to priorities and submit again.
         </Typography>
-        <Button type="button" variant="primary" className="btn-block planning-shell-cta" onClick={() => navigate('/user/priority')}>
+        <Button type="button" variant="primary" className="btn-block planning-shell-cta" onClick={() => navigate('/user/planning')}>
           Go to Study Planner
         </Button>
       </UserAuthShell>
@@ -467,7 +467,7 @@ const Schedule = () => {
         ) : null}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-            <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/priority')}>
+            <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/planning')}>
               Back to Study Planner
             </Button>
             <Button type="button" variant="primary" className="planning-shell-cta" onClick={() => navigate('/user/dashboard', { state: location.state })}>

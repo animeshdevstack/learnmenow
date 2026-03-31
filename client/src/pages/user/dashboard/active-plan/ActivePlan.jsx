@@ -125,7 +125,7 @@ const ActivePlan = () => {
                 <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => void refetch()}>
                   Retry
                 </Button>
-                <Button type="button" variant="primary" className="planning-shell-cta" onClick={() => navigate('/user/priority')}>
+                <Button type="button" variant="primary" className="planning-shell-cta" onClick={() => navigate('/user/planning')}>
                   Study Planner
                 </Button>
               </Box>

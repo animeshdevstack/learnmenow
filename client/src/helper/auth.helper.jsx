@@ -93,9 +93,9 @@ export const setStoredUserCompetitionId = (competitionId) => {
 }
 
 export const logout = () => {
+  const redirectTo = isAdmin() ? '/auth' : '/user/login'
   removeAuthToken()
-  // Redirect to login page
-  window.location.href = '/auth'
+  window.location.href = redirectTo
 }
 
 // Decode JWT token and get user info

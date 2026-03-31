@@ -104,7 +104,7 @@ const Dashboard = () => {
           type="button"
           variant="secondary"
           className="planning-back-btn user-dashboard-popup__back"
-          onClick={() => navigate('/user/priority')}
+          onClick={() => navigate('/user/planning')}
           aria-label="Back to Study Planner"
           icon={<ArrowBack sx={{ fontSize: 18 }} />}
         >
@@ -179,7 +179,7 @@ const Dashboard = () => {
           Sign out
         </Button>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center', justifyContent: 'flex-end' }}>
-          <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/priority')}>
+          <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/planning')}>
             Back to Study Planner
           </Button>
         </Box>
