@@ -1,0 +1,206 @@
+/* Today plan — viewport-locked “popup”: scroll only in the middle; header/footer fixed in panel */
+
+.user-auth-shell.today-plan-shell {
+  overflow: hidden !important;
+  box-sizing: border-box;
+}
+
+.user-auth-shell.today-plan-shell .MuiContainer-root,
+.user-auth-shell.today-plan-shell .MuiContainer-root > div {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.today-plan-popup {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.today-plan-popup__header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  flex-shrink: 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.35);
+  margin-bottom: 0.75rem;
+}
+
+.today-plan-popup__back {
+  flex-shrink: 0;
+}
+
+.today-plan-popup__scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 2px;
+}
+
+/* Today plan — aligns with Schedule / Dashboard slate + cyan theme */
+
+.schedule-chip.MuiChip-root {
+  height: 24px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(6, 182, 212, 0.15);
+  color: rgba(165, 243, 252, 0.95);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.schedule-chip--muted.MuiChip-root {
+  background: rgba(71, 85, 105, 0.35);
+  color: rgba(226, 232, 240, 0.92);
+  border-color: rgba(71, 85, 105, 0.55);
+}
+
+.today-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(71, 85, 105, 0.4);
+}
+
+.today-plan-day {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  width: 100%;
+}
+
+.today-plan-day__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.35);
+}
+
+.today-plan-day__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(241, 245, 249, 0.98);
+  letter-spacing: 0.02em;
+}
+
+.today-plan-day__sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.today-plan-day__meta {
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.today-plan-sessions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.today-plan-session {
+  display: grid;
+  grid-template-columns: minmax(148px, 1fr) 2fr;
+  gap: 0.75rem 1rem;
+  align-items: start;
+  padding: 0.65rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(51, 65, 85, 0.35);
+}
+
+@media (max-width: 520px) {
+  .today-plan-session {
+    grid-template-columns: 1fr;
+  }
+}
+
+.today-plan-time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(226, 232, 240, 0.98);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.45);
+}
+
+.today-plan-session__nextday {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(251, 191, 36, 0.95);
+  margin-top: 0.25rem;
+}
+
+.today-plan-session__body {
+  min-width: 0;
+}
+
+.today-plan-session__topic {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(241, 245, 249, 0.98);
+  line-height: 1.35;
+}
+
+.today-plan-session__crumb {
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.95);
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+.today-plan-session__dur {
+  font-size: 0.7rem;
+  color: rgba(203, 213, 225, 0.85);
+  margin-top: 0.35rem;
+}
+
+.today-plan-empty {
+  font-size: 0.85rem;
+  color: rgba(148, 163, 184, 0.95);
+  margin: 0;
+}
+
+.today-plan-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.today-plan-meta {
+  font-size: 0.78rem;
+  color: rgba(148, 163, 184, 0.95);
+}

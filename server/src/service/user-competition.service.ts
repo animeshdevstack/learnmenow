@@ -218,6 +218,10 @@ const updateCompetitionService = async (userId: string, CompetitionId: string): 
     const user = await userModel.findById(userId);
     if (!user) throw new Error("No user found with the provided userId");
 
+    if (user.Role === "User" && user.CompetitionId) {
+      throw new Error("Competition already exists");
+    }
+
     user.CompetitionId = new mongoose.Types.ObjectId(CompetitionId);
     await user.save();
     return {
@@ -677,8 +681,68 @@ const updateUserScheduleService = async (
   }
 };
 
+/** Full saved timetable for the user (read-only view). */
+const getActivePlanService = async (userId: string): Promise<any> => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new Error("Invalid user id");
+    }
+    const doc = await userScheduleModel
+      .findOne({ userId: new mongoose.Types.ObjectId(userId) })
+      .lean();
+    if (!doc) {
+      throw new Error("No plan found for the user");
+    }
+    return {
+      scheduleId: String(doc._id),
+      summary: doc.summary ?? null,
+      topics: Array.isArray(doc.topics) ? doc.topics : [],
+      schedule: Array.isArray(doc.schedule) ? doc.schedule : [],
+      startDate: doc.startDate,
+      deadline: doc.deadline,
+      preferredSlots: doc.preferredSlots,
+      studyTime: doc.studyTime,
+      totalTime: doc.totalTime,
+    };
+  } catch (error: any) {
+    throw new Error(error.message || "Internal server error");
+  }
+};
+
+const getTodayPlanService = async (userId: string): Promise<any> => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new Error("Invalid user id");
+    }
+    const userPlan = await userScheduleModel.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+    if (!userPlan) {
+      throw new Error("No plan found for the user");
+    }
+    const userSchedule = userPlan.schedule;
+    if (!userSchedule) {
+      throw new Error("No schedule found for the user");
+    }
+    const todayUtc = new Date().toISOString().split("T")[0];
+    const todaySchedule = userSchedule.find((item: any) => item?.date === todayUtc);
+    if (!todaySchedule) {
+      throw new Error("No schedule found today");
+    }
+    // Day entries are plain objects in `schedule[]` (no `_id`). The plan document id is `userPlan._id`.
+    return {
+      scheduleId: String(userPlan._id),
+      summary: userPlan.summary,
+      topics: userPlan.topics,
+      day: todaySchedule
+    };
+  } catch (error: any) {
+    throw new Error(error.message || "Internal server error");
+  }
+};
+
 export {
   updateCompetitionService,
   scheduleTimeTableService,
-  updateUserScheduleService
+  updateUserScheduleService,
+  getActivePlanService,
+  getTodayPlanService
 };

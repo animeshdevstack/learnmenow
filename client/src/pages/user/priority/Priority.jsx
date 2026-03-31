@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { CalendarMonth, MenuBook } from '@mui/icons-material'
+import { ArrowBack, CalendarMonth, MenuBook } from '@mui/icons-material'
 import UserAuthShell from '@/components/user/UserAuthShell'
 import UserLabeledSelect from '@/components/user/UserLabeledSelect'
 import Button from '../../../components/shared/button/Button'
@@ -25,6 +25,8 @@ import {
   userSelectFieldLabelSx,
   userSelectPlaceholderSx,
   userSelectValueSx,
+  userShellSubtitleSx,
+  userShellTitleSx,
 } from '@/components/user/userAuthShell.theme'
 import { getAuthToken } from '../../../helper/auth.helper'
 import Config from '../../../config/config'
@@ -34,6 +36,14 @@ import './Priority.css'
 const brandMark = <MenuBook sx={{ color: 'white', fontSize: 22 }} />
 
 const shellPaper = { maxWidth: 600, width: '100%', mx: 'auto' }
+
+const viewportPaperSx = {
+  ...shellPaper,
+  maxWidth: 600,
+  height: { xs: 'calc(100dvh - 32px)', sm: 'calc(100dvh - 48px)' },
+  maxHeight: { xs: 'calc(100dvh - 32px)', sm: 'calc(100dvh - 48px)' },
+  overflow: 'hidden',
+}
 
 /** API values; order preserved when sending `preferredSlot` array. */
 const PREFERRED_SLOT_OPTIONS = [
@@ -177,50 +187,74 @@ const Priority = () => {
   }
 
   if (topicList.length === 0) {
-    return (
-      <UserAuthShell
-        title="Study Planner"
-        subtitle="Add topics from the previous step to set priorities."
-        brandMark={brandMark}
-        paperAlign="stretch"
-        containerMaxWidth="sm"
-        paperSx={shellPaper}
-      >
-        <Typography variant="body2" sx={{ ...userEmptyStateTextSx, mb: 2 }}>
-          No topics selected yet. Complete planning and choose topics first.
-        </Typography>
-        <Button type="button" variant="primary" className="btn-block planning-shell-cta" onClick={() => navigate('/user/planning')}>
-          Back to planning
+    const emptyHeader = (
+      <Box className="priority-popup__header" sx={{ flexShrink: 0, width: '100%' }}>
+        <Box sx={{ flex: 1, minWidth: 0, pr: 1 }}>
+          <Typography component="h1" variant="h5" sx={{ ...userShellTitleSx, width: '100%', mb: 0.5 }}>
+            Study Planner
+          </Typography>
+          <Typography variant="body2" sx={{ ...userShellSubtitleSx, width: '100%', mb: 0 }}>
+            Add topics from the previous step to set priorities.
+          </Typography>
+        </Box>
+        <Button
+          type="button"
+          variant="secondary"
+          className="planning-back-btn priority-popup__back"
+          onClick={() => navigate('/user/planning')}
+          aria-label="Back to planning"
+          icon={<ArrowBack sx={{ fontSize: 18 }} />}
+        >
+          Back
         </Button>
+      </Box>
+    )
+
+    return (
+      <UserAuthShell brandMark={brandMark} paperAlign="stretch" fullWidth className="priority-shell" paperSx={viewportPaperSx}>
+        <Box
+          className="priority-popup"
+          sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', width: '100%' }}
+        >
+          {emptyHeader}
+          <Box className="priority-popup__scroll" sx={{ flex: 1, minHeight: 0 }}>
+            <Typography variant="body2" sx={{ ...userEmptyStateTextSx, mb: 2 }}>
+              No topics selected yet. Complete planning and choose topics first.
+            </Typography>
+            <Button type="button" variant="primary" className="btn-block planning-shell-cta" onClick={() => navigate('/user/planning')}>
+              Back to planning
+            </Button>
+          </Box>
+        </Box>
       </UserAuthShell>
     )
   }
 
-  return (
-    <UserAuthShell title="Study Planner" brandMark={brandMark} paperAlign="stretch" containerMaxWidth="sm" paperSx={shellPaper}>
-      <div className="priority-card">
-        <h2 className="priority-card-title">Add Priority In Your Task</h2>
-        {topicList.map((t) => (
-          <div key={t.id} className="priority-topic-row">
-            <span className="priority-topic-name">{t.name}</span>
-            <div className="priority-ranks" role="group" aria-label={`Priority for ${t.name}`}>
-              {RANKS.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  className={`priority-rank-btn priority-rank-btn--${r} ${priorities[t.id] === r ? 'is-active' : ''}`}
-                  onClick={() => setRank(t.id, r)}
-                  aria-pressed={priorities[t.id] === r}
-                  aria-label={`Priority ${r}`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+  const headerBlock = (
+    <Box className="priority-popup__header" sx={{ flexShrink: 0, width: '100%' }}>
+      <Box sx={{ flex: 1, minWidth: 0, pr: 1 }}>
+        <Typography component="h1" variant="h5" sx={{ ...userShellTitleSx, width: '100%', mb: 0.5 }}>
+          Study Planner
+        </Typography>
+        <Typography variant="body2" sx={{ ...userShellSubtitleSx, width: '100%', mb: 0 }}>
+          Set topic priorities, dates, and hours — then generate your timetable.
+        </Typography>
+      </Box>
+      <Button
+        type="button"
+        variant="secondary"
+        className="planning-back-btn priority-popup__back"
+        onClick={() => navigate('/user/dashboard')}
+        aria-label="Back to dashboard"
+        icon={<ArrowBack sx={{ fontSize: 18 }} />}
+      >
+        Back
+      </Button>
+    </Box>
+  )
 
+  const formAndCta = (
+    <Box className="priority-popup__footer">
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
         <Box
           sx={{
@@ -386,27 +420,61 @@ const Priority = () => {
       </Box>
 
       {submitError && (
-        <Alert severity="error" sx={{ mt: 2, width: '100%' }} onClose={() => setSubmitError('')}>
+        <Alert severity="error" sx={{ mt: 1, width: '100%' }} onClose={() => setSubmitError('')}>
           {submitError}
         </Alert>
       )}
 
-      <div className="priority-form-actions planning-actions">
-        <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/planning')}>
-          Back
+      <Box className="priority-popup-actions">
+        <Button
+          type="button"
+          variant="primary"
+          className="priority-schedule-btn btn-block"
+          disabled={!canSubmit || submitting}
+          loading={submitting}
+          onClick={handleSchedule}
+        >
+          Schedule Plan
         </Button>
-      </div>
+      </Box>
+    </Box>
+  )
 
-      <Button
-        type="button"
-        variant="primary"
-        className="priority-schedule-btn btn-block"
-        disabled={!canSubmit || submitting}
-        loading={submitting}
-        onClick={handleSchedule}
+  return (
+    <UserAuthShell brandMark={brandMark} paperAlign="stretch" fullWidth className="priority-shell" paperSx={viewportPaperSx}>
+      <Box
+        className="priority-popup"
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', width: '100%' }}
       >
-        Schedule Plan
-      </Button>
+        {headerBlock}
+
+        <Box className="priority-popup__scroll" sx={{ flex: 1, minHeight: 0 }}>
+          <div className="priority-card">
+            <h2 className="priority-card-title">Add Priority In Your Task</h2>
+            {topicList.map((t) => (
+              <div key={t.id} className="priority-topic-row">
+                <span className="priority-topic-name">{t.name}</span>
+                <div className="priority-ranks" role="group" aria-label={`Priority for ${t.name}`}>
+                  {RANKS.map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      className={`priority-rank-btn priority-rank-btn--${r} ${priorities[t.id] === r ? 'is-active' : ''}`}
+                      onClick={() => setRank(t.id, r)}
+                      aria-pressed={priorities[t.id] === r}
+                      aria-label={`Priority ${r}`}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Box>
+
+        {formAndCta}
+      </Box>
     </UserAuthShell>
   )
 }

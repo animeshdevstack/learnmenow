@@ -81,10 +81,21 @@ export const removeAuthToken = () => {
   localStorage.removeItem(USER_STORAGE_KEY)
 }
 
+export const setStoredUserCompetitionId = (competitionId) => {
+  const stored = getStoredUser() || {}
+  localStorage.setItem(
+    USER_STORAGE_KEY,
+    JSON.stringify({
+      ...stored,
+      competitionId: competitionId ?? undefined,
+    })
+  )
+}
+
 export const logout = () => {
+  const redirectTo = isAdmin() ? '/auth' : '/user/login'
   removeAuthToken()
-  // Redirect to login page
-  window.location.href = '/auth'
+  window.location.href = redirectTo
 }
 
 // Decode JWT token and get user info

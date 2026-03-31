@@ -23,6 +23,7 @@ import { getAuthToken } from '../../../helper/auth.helper'
 import Config from '../../../config/config'
 import { userEmptyStateTextSx, userSelectFieldLabelSx } from '@/components/user/userAuthShell.theme'
 import { computeEndFromStart, conflictsWithSiblings } from './scheduleHelpers'
+import { formatCalendarDate, slotClockRangeTooltip, slotLabel } from '../../../utils/scheduleDisplayLabels'
 import './Schedule.css'
 
 const ROUTINE_STORAGE_KEY = 'learnMeNowRoutine'
@@ -30,42 +31,6 @@ const ROUTINE_STORAGE_KEY = 'learnMeNowRoutine'
 const brandMark = <MenuBook sx={{ color: 'white', fontSize: 22 }} />
 
 const shellPaper = { maxWidth: 900, width: '100%', mx: 'auto' }
-
-const formatCalendarDate = (isoDate) => {
-  if (!isoDate || typeof isoDate !== 'string') return ''
-  const parts = isoDate.split('-').map(Number)
-  if (parts.length !== 3 || parts.some(Number.isNaN)) return isoDate
-  const [y, m, d] = parts
-  const dt = new Date(y, m - 1, d)
-  return dt.toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
-const slotLabel = (value) => {
-  const map = {
-    morning: 'Morning',
-    afternoon: 'Afternoon',
-    evening: 'Evening',
-    night: 'Night',
-    late_night: 'Late Night',
-  }
-  return map[value] || value
-}
-
-const slotClockRangeTooltip = (value) => {
-  const map = {
-    morning: '05:00–12:00',
-    afternoon: '12:00–17:00',
-    evening: '17:00–21:00',
-    night: '21:00–23:00',
-    late_night: '23:00–24:00 or 00:00–05:00 (one segment per day, chosen at random)',
-  }
-  return map[value] || ''
-}
 
 const Schedule = () => {
   const navigate = useNavigate()
@@ -276,7 +241,7 @@ const Schedule = () => {
           Generate a plan from Study Planner to see your timetable here. If you already created one, open this page again right after
           generating, or return to priorities and submit again.
         </Typography>
-        <Button type="button" variant="primary" className="btn-block planning-shell-cta" onClick={() => navigate('/user/priority')}>
+        <Button type="button" variant="primary" className="btn-block planning-shell-cta" onClick={() => navigate('/user/planning')}>
           Go to Study Planner
         </Button>
       </UserAuthShell>
@@ -502,7 +467,7 @@ const Schedule = () => {
         ) : null}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-            <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/priority')}>
+            <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/planning')}>
               Back to Study Planner
             </Button>
             <Button type="button" variant="primary" className="planning-shell-cta" onClick={() => navigate('/user/dashboard', { state: location.state })}>

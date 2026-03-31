@@ -1,20 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Box, Typography } from '@mui/material'
-import {
-  CalendarMonth,
-  Dashboard as DashboardIcon,
-  EmojiEvents,
-  Logout as LogoutIcon,
-  MenuBook,
-  Schedule as ScheduleIcon,
-  Today,
-  Tune,
-} from '@mui/icons-material'
+import { ArrowBack, CalendarMonth, Dashboard as DashboardIcon, Logout as LogoutIcon, Today } from '@mui/icons-material'
 import UserAuthShell from '@/components/user/UserAuthShell'
 import Button from '../../../components/shared/button/Button'
 import { getAuthToken, getUserInfo, logout } from '../../../helper/auth.helper'
-import { userEmptyStateTextSx, userShellSubtitleSx } from '@/components/user/userAuthShell.theme'
+import { userEmptyStateTextSx, userShellSubtitleSx, userShellTitleSx } from '@/components/user/userAuthShell.theme'
 import './Dashboard.css'
 
 const ROUTINE_STORAGE_KEY = 'learnMeNowRoutine'
@@ -36,14 +27,19 @@ const Dashboard = () => {
 
   const [routineSnapshot, setRoutineSnapshot] = useState(null)
 
-  useEffect(() => {
+  const refreshRoutineFromStorage = useCallback(() => {
     try {
       const raw = sessionStorage.getItem(ROUTINE_STORAGE_KEY)
       if (raw) setRoutineSnapshot(JSON.parse(raw))
+      else setRoutineSnapshot(null)
     } catch {
       setRoutineSnapshot(null)
     }
   }, [])
+
+  useEffect(() => {
+    refreshRoutineFromStorage()
+  }, [refreshRoutineFromStorage])
 
   const summary = routineSnapshot?.summary
   const schedule = routineSnapshot?.schedule
@@ -72,39 +68,6 @@ const Dashboard = () => {
     return `${n} session${n !== 1 ? 's' : ''}${usedPart}`
   }, [hasRoutine, summary?.deadline, summary?.startDate, todayDay, todayIso])
 
-  const navCards = useMemo(
-    () => [
-      {
-        to: '/user/competition',
-        title: 'Competition',
-        description: 'Choose the exam or competition you are preparing for.',
-        icon: <EmojiEvents className="user-dashboard-card__icon" />,
-      },
-      {
-        to: '/user/planning',
-        title: 'Topic planning',
-        description: 'Pick subjects, chapters, and topics to study.',
-        icon: <MenuBook className="user-dashboard-card__icon" />,
-      },
-      {
-        to: '/user/priority',
-        title: 'Study Planner',
-        description: 'Set priorities, dates, and generate your timetable.',
-        icon: <Tune className="user-dashboard-card__icon" />,
-      },
-      {
-        to: '/user/schedule',
-        title: 'Schedule',
-        description: hasRoutine
-          ? `Plan loaded: ${formatShortRange(summary?.startDate, summary?.deadline)}`
-          : 'View and adjust your generated study sessions.',
-        icon: <ScheduleIcon className="user-dashboard-card__icon" />,
-        highlight: hasRoutine,
-      },
-    ],
-    [hasRoutine, summary?.deadline, summary?.startDate]
-  )
-
   if (!token) {
     return (
       <UserAuthShell title="Dashboard" brandMark={brandMark} paperAlign="stretch" containerMaxWidth="sm" paperSx={shellPaper}>
@@ -120,68 +83,91 @@ const Dashboard = () => {
 
   return (
     <UserAuthShell
-      title="Dashboard"
-      subtitle={`Welcome back, ${displayName}`}
       brandMark={brandMark}
       paperAlign="stretch"
       fullWidth
       paperSx={{ ...shellPaper, maxWidth: 800 }}
     >
-      <Typography variant="body2" sx={{ ...userShellSubtitleSx, mb: 2.5, width: '100%' }}>
-        Jump back into your learning flow — competition, planning, priorities, and your timetable.
-      </Typography>
-
-      {/* Same layout as Active plan — Today’s sessions summary */}
-      <Box className="user-dashboard-banner" sx={{ mb: 1.25 }}>
-        <Today className="user-dashboard-banner__icon" />
-        <div>
-          <div className="user-dashboard-banner__label">Today&apos;s plan</div>
-          <div className="user-dashboard-banner__text">
-            {todayBannerLine}
-          </div>
-        </div>
-        <Link to="/user/schedule" className="user-dashboard-banner__link">
-          Open schedule
-        </Link>
+      <Box className="user-dashboard-popup__header">
+        <Box sx={{ flex: 1, minWidth: 0, pr: 1 }}>
+          <Typography component="h1" variant="h5" sx={{ ...userShellTitleSx, width: '100%', mb: 0.5 }}>
+            Dashboard
+          </Typography>
+          <Typography variant="body2" sx={{ ...userShellSubtitleSx, width: '100%', mb: 0 }}>
+            Welcome back, {displayName}
+          </Typography>
+          <Typography variant="body2" sx={{ ...userShellSubtitleSx, width: '100%', mt: 1, opacity: 0.95 }}>
+            Jump back into your learning flow — competition, planning, priorities, and your timetable.
+          </Typography>
+        </Box>
+        <Button
+          type="button"
+          variant="secondary"
+          className="planning-back-btn user-dashboard-popup__back"
+          onClick={() => navigate('/user/planning')}
+          aria-label="Back to Study Planner"
+          icon={<ArrowBack sx={{ fontSize: 18 }} />}
+        >
+          Back
+        </Button>
       </Box>
 
-      {hasRoutine ? (
-        <Box className="user-dashboard-banner">
-          <CalendarMonth className="user-dashboard-banner__icon" />
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0 }}>
+        <Box className="user-dashboard-banner" sx={{ mb: 1.25 }}>
+          <Today className="user-dashboard-banner__icon" />
           <div>
-            <div className="user-dashboard-banner__label">Active plan</div>
+            <div className="user-dashboard-banner__label">Today&apos;s plan</div>
             <div className="user-dashboard-banner__text">
-              {formatShortRange(summary.startDate, summary.deadline)}
-              {summary.totalScheduledHours != null ? (
-                <span className="user-dashboard-banner__meta"> · {summary.totalScheduledHours} h scheduled</span>
-              ) : null}
+              {todayBannerLine}
             </div>
           </div>
-          <Link to="/user/schedule" className="user-dashboard-banner__link">
-            Open schedule
-          </Link>
+          <div className="user-dashboard-banner__links">
+            <Link to="/user/today-plan" className="user-dashboard-banner__link">
+              Today
+            </Link>
+          </div>
         </Box>
-      ) : (
-        <div className="user-dashboard-hint">
-          <Typography variant="body2" sx={{ ...userEmptyStateTextSx, mb: 0 }}>
-            No timetable in this browser yet. Use Study Planner to generate a plan, then it will show here.
-          </Typography>
-        </div>
-      )}
 
-      <div className="user-dashboard-grid">
-        {navCards.map((card) => (
-          <Link key={card.to} to={card.to} className={`user-dashboard-card${card.highlight ? ' user-dashboard-card--active' : ''}`}>
-            <div className="user-dashboard-card__icon-wrap">{card.icon}</div>
-            <div className="user-dashboard-card__body">
-              <div className="user-dashboard-card__title">{card.title}</div>
-              <div className="user-dashboard-card__desc">{card.description}</div>
+        {hasRoutine ? (
+          <Box className="user-dashboard-banner">
+            <CalendarMonth className="user-dashboard-banner__icon" />
+            <div>
+              <div className="user-dashboard-banner__label">Active plan</div>
+              <div className="user-dashboard-banner__text">
+                {formatShortRange(summary.startDate, summary.deadline)}
+                {summary.totalScheduledHours != null ? (
+                  <span className="user-dashboard-banner__meta"> · {summary.totalScheduledHours} h scheduled</span>
+                ) : null}
+              </div>
             </div>
-          </Link>
-        ))}
-      </div>
+            <div className="user-dashboard-banner__links">
+              <Link to="/user/active-plan" className="user-dashboard-banner__link">
+                Open schedule
+              </Link>
+            </div>
+          </Box>
+        ) : (
+          <div className="user-dashboard-hint">
+            <Typography variant="body2" sx={{ ...userEmptyStateTextSx, mb: 0 }}>
+              No timetable in this browser yet. Use Study Planner to generate a plan, then it will show here.
+            </Typography>
+          </div>
+        )}
+      </Box>
 
-      <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid rgba(71, 85, 105, 0.4)', width: '100%' }}>
+      <Box
+        sx={{
+          mt: 'auto',
+          pt: 2,
+          borderTop: '1px solid rgba(71, 85, 105, 0.4)',
+          width: '100%',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 1.5,
+        }}
+      >
         <Button
           type="button"
           variant="secondary"
@@ -192,6 +178,11 @@ const Dashboard = () => {
         >
           Sign out
         </Button>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center', justifyContent: 'flex-end' }}>
+          <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => navigate('/user/planning')}>
+            Back to Study Planner
+          </Button>
+        </Box>
       </Box>
     </UserAuthShell>
   )
