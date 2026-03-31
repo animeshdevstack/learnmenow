@@ -739,10 +739,29 @@ const getTodayPlanService = async (userId: string): Promise<any> => {
   }
 };
 
+const checkDeadlineService = async (userId: string): Promise<boolean> => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new Error("Invalid user id");
+    }
+    const userPlan = await userScheduleModel.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+    if (!userPlan) {
+      throw new Error("No plan found for the user");
+    }
+    const deadline = new Date(userPlan.deadline);
+    const today = new Date();
+    /** `true` when the deadline instant is in the past (same instant comparison as before, inverted). */
+    return deadline.getTime() <= today.getTime();  
+  } catch (error: any) {
+    throw new Error(error.message || "Internal server error");
+  }
+};
+
 export {
   updateCompetitionService,
   scheduleTimeTableService,
   updateUserScheduleService,
   getActivePlanService,
-  getTodayPlanService
+  getTodayPlanService,
+  checkDeadlineService
 };

@@ -20,6 +20,7 @@ import {
   updateUserScheduleService,
   getActivePlanService,
   getTodayPlanService,
+  checkDeadlineService
 } from "../service/user-competition.service";
 
 interface AuthRequest extends Request {
@@ -305,6 +306,20 @@ const getActivePlan = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
+const checkDeadline = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const userId = (req.user as any)?.id;
+    const isDeadlinePassed = await checkDeadlineService(userId as string);
+    return res.status(200).json({
+      success: true,
+      message: "Deadline fetched successfully",
+      isDeadlinePassed,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 export {
   createUser,
   getAllUser,
@@ -321,5 +336,6 @@ export {
   scheduleTimeTable,
   updateUserSchedule,
   getTodayPlan,
-  getActivePlan
+  getActivePlan,
+  checkDeadline
 };
