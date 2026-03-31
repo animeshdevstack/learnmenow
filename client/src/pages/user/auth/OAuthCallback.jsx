@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { saveAuthSession, getUserInfo } from "../../../helper/auth.helper";
+import { getPostAuthUserPath } from "../../../helper/userDeadline.helper";
 
 const OAuthCallback = () => {
   const navigate = useNavigate();
@@ -46,7 +47,8 @@ const OAuthCallback = () => {
               state: { message } 
             });
           } else {
-            navigate("/user/dashboard", { 
+            const path = await getPostAuthUserPath()
+            navigate(path, { 
               state: { message } 
             });
           }

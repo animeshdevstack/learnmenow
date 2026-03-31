@@ -30,6 +30,7 @@ import {
 import { motion } from "framer-motion";
 import Config from "../../../config/config";
 import { saveAuthSession, getUserInfo } from "../../../helper/auth.helper";
+import { getPostAuthUserPath } from "../../../helper/userDeadline.helper";
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -133,7 +134,8 @@ const UserLogin = () => {
         if (userInfo.role === 'admin') {
           navigate('/admin/dashboard');
         } else {
-          navigate('/user/competition');
+          const path = await getPostAuthUserPath()
+          navigate(path);
         }
       } else {
         // Handle API errors

@@ -138,14 +138,6 @@ const TodayPlan = () => {
       <Typography variant="body2" sx={{ ...userEmptyStateTextSx, mb: 2 }}>
         If you have not generated a plan yet, or today is outside your plan dates, nothing will show here.
       </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-        <Button type="button" variant="secondary" className="planning-back-btn" onClick={() => void refetch()}>
-          Retry
-        </Button>
-        <Button type="button" variant="primary" className="planning-shell-cta" onClick={() => navigate('/user/planning')}>
-          Study Planner
-        </Button>
-      </Box>
     </>
   ) : (
     <>

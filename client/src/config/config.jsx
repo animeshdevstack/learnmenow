@@ -19,6 +19,8 @@ const Config = {
   userTodayPlanUrl: `${String(backendBase).replace(/\/?$/, '/')}user/today-plan`,
   /** GET full saved timetable for the user (auth). */
   userActivePlanUrl: `${String(backendBase).replace(/\/?$/, '/')}user/active-plan`,
+  /** GET whether the user’s plan deadline is still in the future (auth). */
+  userCheckDeadlineUrl: `${String(backendBase).replace(/\/?$/, '/')}user/check-deadline`,
 }
 
 export default Config

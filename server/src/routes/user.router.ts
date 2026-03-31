@@ -17,7 +17,8 @@ import {
   scheduleTimeTable,
   updateUserSchedule,
   getTodayPlan,
-  getActivePlan
+  getActivePlan,
+  checkDeadline
 } from "../controller/user.controller";
 import { adminMiddleware, authMiddleware } from "../helper/auth-handler";
 
@@ -29,6 +30,7 @@ userRouter.route("/schedule").post(authMiddleware, scheduleTimeTable);
 userRouter.route("/schedule/:scheduleId").put(authMiddleware, updateUserSchedule);
 userRouter.route("/today-plan").get(authMiddleware, getTodayPlan);
 userRouter.route("/active-plan").get(authMiddleware, getActivePlan);
+userRouter.route("/check-deadline").get(authMiddleware, checkDeadline);
 userRouter.route("/:id").get(adminMiddleware, getUserById).put(adminMiddleware, updateUser).delete(adminMiddleware, deleteUser);
 
 userRouter.route("/signup").post(signupUser);
