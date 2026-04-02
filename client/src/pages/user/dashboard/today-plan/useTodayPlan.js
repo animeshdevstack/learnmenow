@@ -47,7 +47,7 @@ export function useTodayPlan(token) {
   }, [token])
 
   const patchSessionCompletion = useCallback(
-    async ({ scheduleId, date, topicId, isCompleted }) => {
+    async ({ scheduleId, date, topicId, startTime, endTime, isCompleted }) => {
       if (!token) {
         throw new Error('Not authenticated.')
       }
@@ -58,7 +58,7 @@ export function useTodayPlan(token) {
       const { data: body } = await axios.patch(
         Config.userScheduleSessionsPatchUrl(scheduleId),
         {
-          updates: [{ date, topicId, isCompleted }],
+          updates: [{ date, topicId, startTime, endTime, isCompleted }],
         },
         {
           headers: {

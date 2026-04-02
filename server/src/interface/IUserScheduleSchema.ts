@@ -43,6 +43,9 @@ interface IPatchScheduleSessionsCompletionPayload {
   updates: Array<{
     date: string;
     topicId: string;
+    /** Disambiguates multiple sessions same topic same day (required when duplicates exist). */
+    startTime: string;
+    endTime: string;
     isCompleted: boolean;
   }>;
 }
