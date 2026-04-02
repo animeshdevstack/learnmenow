@@ -9,6 +9,7 @@ import {
 } from "./interface/IUserService";
 import { getTopicsWithChapterAndSubject } from "../repositories/routine.repository";
 import userScheduleModel from "../model/userSchedule.model";
+import scheduleHistoryModel from "../model/scheduleHistory.model";
 import type {
   IUpdateUserSchedulePayload,
   IPatchScheduleSessionsCompletionPayload
@@ -589,6 +590,11 @@ const scheduleTimeTableService = async (
       { upsert: true, new: true, runValidators: true }
     );
 
+    await scheduleHistoryModel.create({
+      userId: new mongoose.Types.ObjectId(userId),
+      schedule
+    });
+
     return {
       scheduleId: String(saved._id),
       summary,
@@ -880,6 +886,100 @@ const checkDeadlineService = async (userId: string): Promise<boolean> => {
   }
 };
 
+const SCHEDULE_HISTORY_DEFAULT_PAGE = 1;
+const SCHEDULE_HISTORY_DEFAULT_LIMIT = 10;
+const SCHEDULE_HISTORY_MAX_LIMIT = 50;
+
+const parseScheduleHistoryPage = (raw: unknown): number => {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 1) return SCHEDULE_HISTORY_DEFAULT_PAGE;
+  return Math.floor(n);
+};
+
+const parseScheduleHistoryLimit = (raw: unknown): number => {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 1) return SCHEDULE_HISTORY_DEFAULT_LIMIT;
+  return Math.min(Math.floor(n), SCHEDULE_HISTORY_MAX_LIMIT);
+};
+
+export type ScheduleHistoryPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+/** Snapshots from each POST `/user/schedule` (newest first), paginated. */
+const getScheduleHistoryService = async (
+  userId: string,
+  query: { page?: unknown; limit?: unknown }
+): Promise<{
+  items: Array<{
+    id: string;
+    userId: string;
+    schedule: unknown[];
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  pagination: ScheduleHistoryPagination;
+}> => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new Error("Invalid user id");
+    }
+    const limit = parseScheduleHistoryLimit(query.limit);
+    let page = parseScheduleHistoryPage(query.page);
+
+    const oid = new mongoose.Types.ObjectId(userId);
+    const filter = { userId: oid };
+
+    const total = await scheduleHistoryModel.countDocuments(filter);
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+    if (totalPages > 0) {
+      page = Math.min(Math.max(1, page), totalPages);
+    } else {
+      page = 1;
+    }
+    const skip = (page - 1) * limit;
+
+    const rows = await scheduleHistoryModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const items = rows.map((doc) => {
+      const row = doc as typeof doc & { createdAt?: Date; updatedAt?: Date };
+      return {
+        id: String(row._id),
+        userId: String(row.userId),
+        schedule: Array.isArray(row.schedule) ? row.schedule : [],
+        createdAt:
+          row.createdAt instanceof Date
+            ? row.createdAt.toISOString()
+            : String(row.createdAt ?? ""),
+        updatedAt:
+          row.updatedAt instanceof Date
+            ? row.updatedAt.toISOString()
+            : String(row.updatedAt ?? "")
+      };
+    });
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages
+      }
+    };
+  } catch (error: any) {
+    throw new Error(error.message || "Internal server error while fetching schedule history");
+  }
+};
+
 export {
   updateCompetitionService,
   scheduleTimeTableService,
@@ -887,5 +987,6 @@ export {
   patchScheduleSessionsCompletionService,
   getActivePlanService,
   getTodayPlanService,
-  checkDeadlineService
+  checkDeadlineService,
+  getScheduleHistoryService
 };

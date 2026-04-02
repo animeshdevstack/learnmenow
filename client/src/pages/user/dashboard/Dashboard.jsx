@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Box, Typography } from '@mui/material'
-import { ArrowBack, CalendarMonth, Dashboard as DashboardIcon, Logout as LogoutIcon, Today } from '@mui/icons-material'
+import {
+  ArrowBack,
+  CalendarMonth,
+  Dashboard as DashboardIcon,
+  History as HistoryIcon,
+  Logout as LogoutIcon,
+  Today,
+} from '@mui/icons-material'
 import UserAuthShell from '@/components/user/UserAuthShell'
 import Button from '../../../components/shared/button/Button'
 import { getAuthToken, getUserInfo, logout } from '../../../helper/auth.helper'
@@ -129,7 +136,7 @@ const Dashboard = () => {
         </Box>
 
         {hasRoutine ? (
-          <Box className="user-dashboard-banner">
+          <Box className="user-dashboard-banner" sx={{ mb: 1.25 }}>
             <CalendarMonth className="user-dashboard-banner__icon" />
             <div>
               <div className="user-dashboard-banner__label">Active plan</div>
@@ -153,6 +160,21 @@ const Dashboard = () => {
             </Typography>
           </div>
         )}
+
+        <Box className="user-dashboard-banner">
+          <HistoryIcon className="user-dashboard-banner__icon" />
+          <div>
+            <div className="user-dashboard-banner__label">Schedule history</div>
+            <div className="user-dashboard-banner__text">
+              Past generated timetables for your account (user id, dates, sessions by day).
+            </div>
+          </div>
+          <div className="user-dashboard-banner__links">
+            <Link to="/user/schedule-history" className="user-dashboard-banner__link">
+              View history
+            </Link>
+          </div>
+        </Box>
       </Box>
 
       <Box

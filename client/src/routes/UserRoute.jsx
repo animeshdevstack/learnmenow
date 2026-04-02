@@ -13,6 +13,7 @@ import Priority from '../pages/user/priority/Priority'
 import Schedule from '../pages/user/schedule/Schedule'
 import TodayPlan from '../pages/user/dashboard/today-plan/TodayPlan'
 import ActivePlan from '../pages/user/dashboard/active-plan/ActivePlan'
+import ScheduleHistory from '../pages/user/dashboard/schedule-history/ScheduleHistory'
 
 const UserRouting = () => {
   return (
@@ -31,6 +32,7 @@ const UserRouting = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/today-plan" element={<TodayPlan />} />
         <Route path="/active-plan" element={<ActivePlan />} />
+        <Route path="/schedule-history" element={<ScheduleHistory />} />
       </Routes>
   )
 }

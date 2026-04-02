@@ -138,7 +138,20 @@ export default function ScheduleReadOnlyBody({ summary, topics = [], schedule = 
                       <div className="schedule-session__body">
                         <div className="schedule-session__topic">{s.topicName}</div>
                         <div className="schedule-session__crumb">{[s.subjectName, s.chapterName].filter(Boolean).join(' · ')}</div>
-                        <div className="schedule-session__dur">{s.durationMinutes} min</div>
+                        <div className="schedule-session__footer">
+                          <span className="schedule-session__dur">{s.durationMinutes} min</span>
+                        </div>
+                      </div>
+                      <div className="schedule-session__status">
+                        <Chip
+                          size="small"
+                          label={s.isCompleted ? 'Completed' : 'Incomplete'}
+                          className={
+                            s.isCompleted
+                              ? 'schedule-chip schedule-chip--status-complete'
+                              : 'schedule-chip schedule-chip--status-incomplete'
+                          }
+                        />
                       </div>
                     </li>
                   ))}
