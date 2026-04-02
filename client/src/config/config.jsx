@@ -22,6 +22,8 @@ const Config = {
   userTodayPlanUrl: `${String(backendBase).replace(/\/?$/, '/')}user/today-plan`,
   /** GET full saved timetable for the user (auth). */
   userActivePlanUrl: `${String(backendBase).replace(/\/?$/, '/')}user/active-plan`,
+  /** GET schedule generation history snapshots for the user (auth). */
+  userScheduleHistoryUrl: `${String(backendBase).replace(/\/?$/, '/')}user/schedule-history`,
   /** GET whether the user’s plan deadline is still in the future (auth). */
   userCheckDeadlineUrl: `${String(backendBase).replace(/\/?$/, '/')}user/check-deadline`,
 }

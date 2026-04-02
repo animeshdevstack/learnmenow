@@ -21,7 +21,8 @@ import {
   patchScheduleSessionsCompletionService,
   getActivePlanService,
   getTodayPlanService,
-  checkDeadlineService
+  checkDeadlineService,
+  getScheduleHistoryService
 } from "../service/user-competition.service";
 
 interface AuthRequest extends Request {
@@ -345,6 +346,24 @@ const checkDeadline = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
+const getScheduleHistory = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const userId = (req.user as any)?.id;
+    const { items, pagination } = await getScheduleHistoryService(userId as string, {
+      page: req.query.page,
+      limit: req.query.limit
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Schedule history fetched successfully",
+      data: items,
+      pagination
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 export {
   createUser,
   getAllUser,
@@ -363,5 +382,6 @@ export {
   patchScheduleSessionsCompletion,
   getTodayPlan,
   getActivePlan,
-  checkDeadline
+  checkDeadline,
+  getScheduleHistory
 };

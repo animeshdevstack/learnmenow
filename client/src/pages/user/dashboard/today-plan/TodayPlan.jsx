@@ -100,6 +100,10 @@ const TodayPlan = () => {
       setCompletionError('Cannot update this session. Try refreshing the page.')
       return
     }
+    if (!session?.startTime || !session?.endTime) {
+      setCompletionError('Session is missing time range. Try refreshing the page.')
+      return
+    }
     const key = `${session.topicId}-${idx}`
     setBusyKey(key)
     setCompletionError('')
@@ -108,6 +112,8 @@ const TodayPlan = () => {
         scheduleId,
         date: day.date,
         topicId: session.topicId,
+        startTime: session.startTime,
+        endTime: session.endTime,
         isCompleted: !Boolean(session.isCompleted),
       })
       await refetch()

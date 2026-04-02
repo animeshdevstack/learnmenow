@@ -9,6 +9,7 @@ import {
 } from "./interface/IUserService";
 import { getTopicsWithChapterAndSubject } from "../repositories/routine.repository";
 import userScheduleModel from "../model/userSchedule.model";
+import scheduleHistoryModel from "../model/scheduleHistory.model";
 import type {
   IUpdateUserSchedulePayload,
   IPatchScheduleSessionsCompletionPayload
@@ -589,6 +590,12 @@ const scheduleTimeTableService = async (
       { upsert: true, new: true, runValidators: true }
     );
 
+    await scheduleHistoryModel.create({
+      userId: new mongoose.Types.ObjectId(userId),
+      linkedScheduleId: saved._id,
+      schedule
+    });
+
     return {
       scheduleId: String(saved._id),
       summary,
@@ -666,6 +673,24 @@ const updateUserScheduleService = async (
       );
     }
 
+    /**
+     * Keep history snapshots in sync when the full `schedule` is saved via PUT.
+     * This path is used by the Schedule editor ("Done"/save), not only by PATCH sessions endpoint.
+     */
+    if (Array.isArray($set.schedule)) {
+      await scheduleHistoryModel.updateMany(
+        {
+          userId: new mongoose.Types.ObjectId(userId),
+          linkedScheduleId: new mongoose.Types.ObjectId(scheduleId)
+        },
+        {
+          $set: {
+            schedule: $set.schedule
+          }
+        }
+      );
+    }
+
     return {
       scheduleId: String(updated._id),
       summary: updated.summary,
@@ -708,6 +733,64 @@ function schedulePatchReturnShape(updated: {
   };
 }
 
+/** Compare clock labels consistently (handles "9:30" vs "09:30"). */
+const normalizeSessionTime = (v: unknown): string => {
+  const s = String(v ?? "").trim();
+  const m = /^(\d{1,2}):(\d{2})/.exec(s);
+  if (!m) return s;
+  const h = Math.min(23, parseInt(m[1]!, 10));
+  const min = Math.min(59, parseInt(m[2]!, 10));
+  return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+};
+
+/**
+ * Mirror `isCompleted` onto every schedule history row for this user that contains the same session
+ * (date + topicId + startTime + endTime). We match by `userId` only so legacy snapshots without
+ * `linkedScheduleId` still update; rows that do not contain that session are unchanged.
+ */
+const mirrorSessionCompletionToScheduleHistory = async (
+  userId: string,
+  updates: Array<{
+    date: string;
+    topicId: string;
+    startTime: string;
+    endTime: string;
+    isCompleted: boolean;
+  }>
+): Promise<void> => {
+  const oid = new mongoose.Types.ObjectId(userId);
+  const docs = await scheduleHistoryModel.find({ userId: oid });
+  for (const h of docs) {
+    const sched = h.schedule;
+    if (!Array.isArray(sched)) continue;
+    let touched = false;
+    for (const u of updates) {
+      const day = sched.find(
+        (d: unknown) =>
+          d !== null &&
+          typeof d === "object" &&
+          "date" in d &&
+          (d as { date: string }).date === u.date
+      ) as { sessions?: unknown[] } | undefined;
+      if (!day?.sessions) continue;
+      for (const session of day.sessions) {
+        if (!session || typeof session !== "object") continue;
+        const sess = session as Record<string, unknown>;
+        if (String(sess.topicId ?? "").trim() !== u.topicId) continue;
+        if (normalizeSessionTime(sess.startTime) !== u.startTime) continue;
+        if (normalizeSessionTime(sess.endTime) !== u.endTime) continue;
+        (session as { isCompleted: boolean }).isCompleted = u.isCompleted;
+        touched = true;
+      }
+    }
+    if (touched) {
+      /** Mixed arrays: clone so Mongoose persists nested `isCompleted` changes. */
+      h.set("schedule", JSON.parse(JSON.stringify(sched)) as typeof sched);
+      await h.save();
+    }
+  }
+};
+
 /** PATCH nested `schedule[].sessions[].isCompleted` without replacing the whole schedule. */
 const patchScheduleSessionsCompletionService = async (
   userId: string,
@@ -725,7 +808,7 @@ const patchScheduleSessionsCompletionService = async (
     const updates = body?.updates;
     if (!Array.isArray(updates) || updates.length === 0) {
       throw new Error(
-        "Provide a non-empty updates array: { date, topicId, isCompleted }[]"
+        "Provide a non-empty updates array: { date, topicId, startTime, endTime, isCompleted }[]"
       );
     }
 
@@ -736,6 +819,16 @@ const patchScheduleSessionsCompletionService = async (
       }
       if (typeof u.topicId !== "string" || !u.topicId.trim()) {
         throw new Error(`updates[${i}]: topicId is required`);
+      }
+      if (typeof u.startTime !== "string" || !u.startTime.trim()) {
+        throw new Error(
+          `updates[${i}]: startTime is required (identifies the session when the same topic appears twice on one day)`
+        );
+      }
+      if (typeof u.endTime !== "string" || !u.endTime.trim()) {
+        throw new Error(
+          `updates[${i}]: endTime is required (identifies the session when the same topic appears twice on one day)`
+        );
       }
       if (typeof u.isCompleted !== "boolean") {
         throw new Error(`updates[${i}]: isCompleted must be a boolean`);
@@ -758,7 +851,19 @@ const patchScheduleSessionsCompletionService = async (
       throw new Error("This plan has no schedule days to update");
     }
 
+    const normalizedUpdates: Array<{
+      date: string;
+      topicId: string;
+      startTime: string;
+      endTime: string;
+      isCompleted: boolean;
+    }> = [];
+
     for (const u of updates) {
+      const tid = String(u.topicId).trim();
+      const st = normalizeSessionTime(u.startTime);
+      const et = normalizeSessionTime(u.endTime);
+
       const day = schedule.find(
         (d: unknown) =>
           d !== null &&
@@ -773,28 +878,36 @@ const patchScheduleSessionsCompletionService = async (
 
       let matched = false;
       for (const session of day.sessions) {
-        if (
-          session &&
-          typeof session === "object" &&
-          "topicId" in session &&
-          String((session as { topicId: string }).topicId) ===
-            String(u.topicId)
-        ) {
-          (session as unknown as { isCompleted: boolean }).isCompleted =
-            u.isCompleted;
-          matched = true;
-        }
+        if (!session || typeof session !== "object") continue;
+        const sess = session as Record<string, unknown>;
+        const sTopic = String(sess.topicId ?? "").trim();
+        if (sTopic !== tid) continue;
+        if (normalizeSessionTime(sess.startTime) !== st) continue;
+        if (normalizeSessionTime(sess.endTime) !== et) continue;
+        (session as { isCompleted: boolean }).isCompleted = u.isCompleted;
+        matched = true;
+        break;
       }
 
       if (!matched) {
         throw new Error(
-          `No session with topicId ${u.topicId} on date ${u.date}`
+          `No session matching topicId ${tid}, startTime ${st}, endTime ${et} on date ${u.date}`
         );
       }
+
+      normalizedUpdates.push({
+        date: u.date,
+        topicId: tid,
+        startTime: st,
+        endTime: et,
+        isCompleted: u.isCompleted
+      });
     }
 
     doc.markModified("schedule");
     await doc.save();
+
+    await mirrorSessionCompletionToScheduleHistory(userId, normalizedUpdates);
 
     return schedulePatchReturnShape(doc);
   } catch (error: any) {
@@ -880,6 +993,100 @@ const checkDeadlineService = async (userId: string): Promise<boolean> => {
   }
 };
 
+const SCHEDULE_HISTORY_DEFAULT_PAGE = 1;
+const SCHEDULE_HISTORY_DEFAULT_LIMIT = 10;
+const SCHEDULE_HISTORY_MAX_LIMIT = 50;
+
+const parseScheduleHistoryPage = (raw: unknown): number => {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 1) return SCHEDULE_HISTORY_DEFAULT_PAGE;
+  return Math.floor(n);
+};
+
+const parseScheduleHistoryLimit = (raw: unknown): number => {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 1) return SCHEDULE_HISTORY_DEFAULT_LIMIT;
+  return Math.min(Math.floor(n), SCHEDULE_HISTORY_MAX_LIMIT);
+};
+
+export type ScheduleHistoryPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+/** Snapshots from each POST `/user/schedule` (newest first), paginated. */
+const getScheduleHistoryService = async (
+  userId: string,
+  query: { page?: unknown; limit?: unknown }
+): Promise<{
+  items: Array<{
+    id: string;
+    userId: string;
+    schedule: unknown[];
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  pagination: ScheduleHistoryPagination;
+}> => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new Error("Invalid user id");
+    }
+    const limit = parseScheduleHistoryLimit(query.limit);
+    let page = parseScheduleHistoryPage(query.page);
+
+    const oid = new mongoose.Types.ObjectId(userId);
+    const filter = { userId: oid };
+
+    const total = await scheduleHistoryModel.countDocuments(filter);
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+    if (totalPages > 0) {
+      page = Math.min(Math.max(1, page), totalPages);
+    } else {
+      page = 1;
+    }
+    const skip = (page - 1) * limit;
+
+    const rows = await scheduleHistoryModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const items = rows.map((doc) => {
+      const row = doc as typeof doc & { createdAt?: Date; updatedAt?: Date };
+      return {
+        id: String(row._id),
+        userId: String(row.userId),
+        schedule: Array.isArray(row.schedule) ? row.schedule : [],
+        createdAt:
+          row.createdAt instanceof Date
+            ? row.createdAt.toISOString()
+            : String(row.createdAt ?? ""),
+        updatedAt:
+          row.updatedAt instanceof Date
+            ? row.updatedAt.toISOString()
+            : String(row.updatedAt ?? "")
+      };
+    });
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages
+      }
+    };
+  } catch (error: any) {
+    throw new Error(error.message || "Internal server error while fetching schedule history");
+  }
+};
+
 export {
   updateCompetitionService,
   scheduleTimeTableService,
@@ -887,5 +1094,6 @@ export {
   patchScheduleSessionsCompletionService,
   getActivePlanService,
   getTodayPlanService,
-  checkDeadlineService
+  checkDeadlineService,
+  getScheduleHistoryService
 };
