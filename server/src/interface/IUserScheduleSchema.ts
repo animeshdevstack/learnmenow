@@ -38,6 +38,15 @@ interface IUserScheduleSchema {
   selectedTopics?: Record<string, unknown>[];
 }
 
+/** Partial body for PATCH `/user/schedule/:scheduleId/sessions` — toggles session completion. */
+interface IPatchScheduleSessionsCompletionPayload {
+  updates: Array<{
+    date: string;
+    topicId: string;
+    isCompleted: boolean;
+  }>;
+}
+
 /** Partial body for PUT `/user/schedule/:scheduleId` — only sent fields are applied. */
 interface IUpdateUserSchedulePayload {
   summary?: Record<string, unknown>;
@@ -51,5 +60,9 @@ interface IUpdateUserSchedulePayload {
   studyTime?: { weekdays: number; weekends: number };
 }
 
-export type { IUserScheduleTopic, IUpdateUserSchedulePayload };
+export type {
+  IUserScheduleTopic,
+  IUpdateUserSchedulePayload,
+  IPatchScheduleSessionsCompletionPayload
+};
 export default IUserScheduleSchema;

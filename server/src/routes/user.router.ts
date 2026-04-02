@@ -16,6 +16,7 @@ import {
   updateCompetition,
   scheduleTimeTable,
   updateUserSchedule,
+  patchScheduleSessionsCompletion,
   getTodayPlan,
   getActivePlan,
   checkDeadline
@@ -27,6 +28,9 @@ const userRouter = Router();
 userRouter.route("/").get(adminMiddleware, getAllUser).post(adminMiddleware, createUser);
 userRouter.route("/update-competition").put(authMiddleware, updateCompetition);
 userRouter.route("/schedule").post(authMiddleware, scheduleTimeTable);
+userRouter
+  .route("/schedule/:scheduleId/sessions")
+  .patch(authMiddleware, patchScheduleSessionsCompletion);
 userRouter.route("/schedule/:scheduleId").put(authMiddleware, updateUserSchedule);
 userRouter.route("/today-plan").get(authMiddleware, getTodayPlan);
 userRouter.route("/active-plan").get(authMiddleware, getActivePlan);

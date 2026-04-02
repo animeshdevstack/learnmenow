@@ -9,7 +9,10 @@ import {
 } from "./interface/IUserService";
 import { getTopicsWithChapterAndSubject } from "../repositories/routine.repository";
 import userScheduleModel from "../model/userSchedule.model";
-import type { IUpdateUserSchedulePayload } from "../interface/IUserScheduleSchema";
+import type {
+  IUpdateUserSchedulePayload,
+  IPatchScheduleSessionsCompletionPayload
+} from "../interface/IUserScheduleSchema";
 
 const MINUTES_PER_DAY = 24 * 60;
 
@@ -681,6 +684,126 @@ const updateUserScheduleService = async (
   }
 };
 
+function schedulePatchReturnShape(updated: {
+  _id: unknown;
+  summary?: unknown;
+  topics?: unknown;
+  schedule?: unknown;
+  startDate: string;
+  deadline: string;
+  preferredSlots: string[];
+  studyTime?: { weekdays: number; weekends: number };
+  totalTime: number;
+}) {
+  return {
+    scheduleId: String(updated._id),
+    summary: updated.summary,
+    topics: updated.topics,
+    schedule: updated.schedule,
+    startDate: updated.startDate,
+    deadline: updated.deadline,
+    preferredSlots: updated.preferredSlots,
+    studyTime: updated.studyTime,
+    totalTime: updated.totalTime
+  };
+}
+
+/** PATCH nested `schedule[].sessions[].isCompleted` without replacing the whole schedule. */
+const patchScheduleSessionsCompletionService = async (
+  userId: string,
+  scheduleId: string,
+  body: IPatchScheduleSessionsCompletionPayload
+): Promise<ReturnType<typeof schedulePatchReturnShape>> => {
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new Error("Invalid user id");
+    }
+    if (!mongoose.isValidObjectId(scheduleId)) {
+      throw new Error("Invalid schedule id");
+    }
+
+    const updates = body?.updates;
+    if (!Array.isArray(updates) || updates.length === 0) {
+      throw new Error(
+        "Provide a non-empty updates array: { date, topicId, isCompleted }[]"
+      );
+    }
+
+    for (let i = 0; i < updates.length; i++) {
+      const u = updates[i];
+      if (!u || typeof u.date !== "string" || !u.date.trim()) {
+        throw new Error(`updates[${i}]: date is required`);
+      }
+      if (typeof u.topicId !== "string" || !u.topicId.trim()) {
+        throw new Error(`updates[${i}]: topicId is required`);
+      }
+      if (typeof u.isCompleted !== "boolean") {
+        throw new Error(`updates[${i}]: isCompleted must be a boolean`);
+      }
+    }
+
+    const doc = await userScheduleModel.findOne({
+      _id: new mongoose.Types.ObjectId(scheduleId),
+      userId: new mongoose.Types.ObjectId(userId)
+    });
+
+    if (!doc) {
+      throw new Error(
+        "Schedule not found or you do not have permission to update it."
+      );
+    }
+
+    const schedule = doc.schedule;
+    if (!Array.isArray(schedule)) {
+      throw new Error("This plan has no schedule days to update");
+    }
+
+    for (const u of updates) {
+      const day = schedule.find(
+        (d: unknown) =>
+          d !== null &&
+          typeof d === "object" &&
+          "date" in d &&
+          (d as { date: string }).date === u.date
+      ) as { sessions?: unknown[] } | undefined;
+
+      if (!day || !Array.isArray(day.sessions)) {
+        throw new Error(`No sessions found for date ${u.date}`);
+      }
+
+      let matched = false;
+      for (const session of day.sessions) {
+        if (
+          session &&
+          typeof session === "object" &&
+          "topicId" in session &&
+          String((session as { topicId: string }).topicId) ===
+            String(u.topicId)
+        ) {
+          (session as unknown as { isCompleted: boolean }).isCompleted =
+            u.isCompleted;
+          matched = true;
+        }
+      }
+
+      if (!matched) {
+        throw new Error(
+          `No session with topicId ${u.topicId} on date ${u.date}`
+        );
+      }
+    }
+
+    doc.markModified("schedule");
+    await doc.save();
+
+    return schedulePatchReturnShape(doc);
+  } catch (error: any) {
+    throw new Error(
+      error.message || "Internal server error while patching sessions"
+    );
+  }
+};
+
 /** Full saved timetable for the user (read-only view). */
 const getActivePlanService = async (userId: string): Promise<any> => {
   try {
@@ -761,6 +884,7 @@ export {
   updateCompetitionService,
   scheduleTimeTableService,
   updateUserScheduleService,
+  patchScheduleSessionsCompletionService,
   getActivePlanService,
   getTodayPlanService,
   checkDeadlineService

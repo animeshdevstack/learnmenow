@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Alert, Box, Chip, CircularProgress, Tooltip, Typography } from '@mui/material'
-import { ArrowBack, CalendarMonth, Logout as LogoutIcon, Today } from '@mui/icons-material'
+import { ArrowBack, CalendarMonth, CheckCircle, Logout as LogoutIcon, Today } from '@mui/icons-material'
 import UserAuthShell from '@/components/user/UserAuthShell'
 import Button from '@/components/shared/button/Button'
 import { userAccentSpinnerSx, userEmptyStateTextSx, userShellSubtitleSx, userShellTitleSx } from '@/components/user/userAuthShell.theme'
@@ -21,7 +21,7 @@ const viewportPaperSx = {
   overflow: 'hidden',
 }
 
-function SessionRows({ day }) {
+function SessionRows({ day, scheduleId, busyKey, onToggleSession }) {
   const sessions = Array.isArray(day?.sessions) ? day.sessions : []
   if (sessions.length === 0) {
     return <p className="today-plan-empty">No study blocks scheduled for today.</p>
@@ -29,23 +29,57 @@ function SessionRows({ day }) {
 
   return (
     <ul className="today-plan-sessions" aria-label="Today's sessions">
-      {sessions.map((s, idx) => (
-        <li key={`${s.topicId}-${s.startTime}-${idx}`} className="today-plan-session">
-          <div>
-            <span className="today-plan-time">
-              {s.startTime} – {s.endTime}
-            </span>
-            {s.spansNextDay || (s.endDate && s.startDate && s.endDate !== s.startDate) ? (
-              <div className="today-plan-session__nextday">ends {formatCalendarDate(s.endDate)}</div>
-            ) : null}
-          </div>
-          <div className="today-plan-session__body">
-            <div className="today-plan-session__topic">{s.topicName}</div>
-            <div className="today-plan-session__crumb">{[s.subjectName, s.chapterName].filter(Boolean).join(' · ')}</div>
-            <div className="today-plan-session__dur">{s.durationMinutes} min</div>
-          </div>
-        </li>
-      ))}
+      {sessions.map((s, idx) => {
+        const rowKey = `${s.topicId}-${idx}`
+        const busy = busyKey === rowKey
+        const done = Boolean(s.isCompleted)
+        const statusLabel = done ? 'Done' : 'Mark done'
+        const ariaLabel = `${statusLabel}: ${s.topicName || 'session'}`
+
+        return (
+          <li
+            key={`${s.topicId}-${s.startTime}-${idx}`}
+            className={`today-plan-session${done ? ' today-plan-session--completed' : ''}`}
+          >
+            <div className="today-plan-session__left">
+              <span className="today-plan-time">
+                {s.startTime} – {s.endTime}
+              </span>
+              {s.spansNextDay || (s.endDate && s.startDate && s.endDate !== s.startDate) ? (
+                <div className="today-plan-session__nextday">ends {formatCalendarDate(s.endDate)}</div>
+              ) : null}
+            </div>
+            <div className="today-plan-session__body">
+              <div className="today-plan-session__topic">{s.topicName}</div>
+              <div className="today-plan-session__crumb">{[s.subjectName, s.chapterName].filter(Boolean).join(' · ')}</div>
+              <div className="today-plan-session__dur">{s.durationMinutes} min</div>
+            </div>
+            <div className="today-plan-session__actions">
+              <Tooltip title={done ? 'Mark as not done' : 'Mark this block as done'} placement="left">
+                <button
+                  type="button"
+                  className={`today-plan-session__status${done ? ' today-plan-session__status--done' : ''}`}
+                  disabled={!scheduleId || busy}
+                  onClick={() => onToggleSession(s, idx)}
+                  aria-pressed={done}
+                  aria-label={ariaLabel}
+                >
+                  {busy ? (
+                    <CircularProgress size={14} thickness={5} sx={{ color: 'inherit' }} />
+                  ) : done ? (
+                    <>
+                      <CheckCircle className="today-plan-session__status-icon" aria-hidden />
+                      <span>Done</span>
+                    </>
+                  ) : (
+                    <span>Mark done</span>
+                  )}
+                </button>
+              </Tooltip>
+            </div>
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -53,10 +87,38 @@ function SessionRows({ day }) {
 const TodayPlan = () => {
   const navigate = useNavigate()
   const token = getAuthToken()
-  const { data, loading, error, refetch } = useTodayPlan(token)
+  const { data, loading, error, refetch, patchSessionCompletion } = useTodayPlan(token)
+  const [busyKey, setBusyKey] = useState(null)
+  const [completionError, setCompletionError] = useState('')
 
   const day = data?.day
   const summary = data?.summary
+  const scheduleId = data?.scheduleId
+
+  const handleToggleSession = async (session, idx) => {
+    if (!scheduleId || !day?.date || !session?.topicId) {
+      setCompletionError('Cannot update this session. Try refreshing the page.')
+      return
+    }
+    const key = `${session.topicId}-${idx}`
+    setBusyKey(key)
+    setCompletionError('')
+    try {
+      await patchSessionCompletion({
+        scheduleId,
+        date: day.date,
+        topicId: session.topicId,
+        isCompleted: !Boolean(session.isCompleted),
+      })
+      await refetch()
+    } catch (err) {
+      setCompletionError(
+        err.response?.data?.message || err.message || 'Could not update completion. Try again.'
+      )
+    } finally {
+      setBusyKey(null)
+    }
+  }
 
   if (!token) {
     return (
@@ -87,7 +149,7 @@ const TodayPlan = () => {
           Your study sessions for today only.
         </Typography>
         <Typography variant="body2" sx={{ ...userShellSubtitleSx, width: '100%', mt: 1, opacity: 0.95 }}>
-          Pulled from your saved timetable. Times and topics match what you generated in Study Planner.
+          Pulled from your saved timetable. Use Done to record progress for today only.
         </Typography>
       </Box>
       <Button
@@ -151,6 +213,11 @@ const TodayPlan = () => {
 
       {day ? (
         <article className="today-plan-day">
+          {completionError ? (
+            <Alert severity="warning" sx={{ mb: 1.5, width: '100%' }} onClose={() => setCompletionError('')}>
+              {completionError}
+            </Alert>
+          ) : null}
           <header className="today-plan-day__header">
             <CalendarMonth sx={{ fontSize: 22, color: 'rgba(6, 182, 212, 0.95)', flexShrink: 0 }} />
             <div>
@@ -173,7 +240,12 @@ const TodayPlan = () => {
               </div>
             </div>
           </header>
-          <SessionRows day={day} />
+          <SessionRows
+            day={day}
+            scheduleId={scheduleId}
+            busyKey={busyKey}
+            onToggleSession={handleToggleSession}
+          />
         </article>
       ) : (
         <Alert severity="info" sx={{ width: '100%' }}>
